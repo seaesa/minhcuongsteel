@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Thép minh cường - CÔNG TY CỔ PHẦN CƠ KHÍ XÂY LẮP THƯƠNG MẠI MINH CƯỜNG</title>
+<meta name="description" content="Là thương hiệu Công ty cổ phần Cơ khí - Xây lắp - Thương mại Minh Cường, có thâm niên hơn 28 năm hoạt động lĩnh vực xây dựng nhà tiền chế, kết cấu thép, xây dựng, cơ khí ở Việt Nam.">
+<link rel="icon" href="images/logo.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="wrapper">
+
+<header id="header" class="header">
+  <div class="header-wrapper" id="headerWrapper">
+    <div class="header-main">
+      <div class="header-inner container">
+        <div class="logo"><a href="index.html" title="Thép minh cường"><img src="images/logo.svg" alt="Thép minh cường" width="92" height="59"></a></div>
+
+        <ul class="mobile-nav nav-left show-for-medium">
+          <li><button class="nav-icon" id="menuOpen" aria-label="Menu"><img src="images/theme/menu.svg" alt="" width="24" height="24"></button></li>
+        </ul>
+
+        <ul class="header-nav hide-for-medium">
+          {{DESKTOP_NAV}}
+          <li class="header-search"><button class="search-toggle" aria-label="Search" data-search>{{SEARCH}}</button></li>
+          <li class="header-lang">{{LANG}}</li>
+          <li class="header-button"><a href="https://heyzine.com/flip-book/c0f9153ebe.html" target="_blank" rel="noopener" class="button primary btn-profile"><span>Profile</span></a></li>
+          <li class="header-button"><a href="{{SITE}}/he-thong-nha-may/" class="button secondary btn-factory"><span>HỆ THỐNG NHÀ MÁY</span></a></li>
+        </ul>
+
+        <ul class="mobile-nav nav-right show-for-medium">
+          <li><button class="search-toggle" aria-label="Search" data-search>{{SEARCH}}</button></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- HERO desktop / tablet -->
+  <div class="home-slider slider-desktop hide-for-small" data-slider="hero">
+    <div class="slider-viewport"><div class="slider-track">
+{{HERO_DESKTOP}}
+    </div></div>
+    <ol class="slider-dots"></ol>
+  </div>
+
+  <!-- HERO mobile -->
+  <div class="home-slider slider-mobile show-for-small" data-slider="hero">
+    <div class="slider-viewport"><div class="slider-track">
+{{HERO_MOBILE}}
+    </div></div>
+    <ol class="slider-dots"></ol>
+  </div>
+
+  <!-- VIDEO -->
+  <section class="section ss-vd scale-ss">
+    <div class="container">
+      {{TITLE_VIDEO}}
+      <div class="vd-row">
+        <div class="vd-col-img" data-animate="fadeInLeft">
+          <a class="video-cus" href="https://www.youtube.com/watch?v=ASVqXfcVHoQ" data-video="ASVqXfcVHoQ">
+            <span class="rings" aria-hidden="true"></span>
+            <span class="img-inner"><img src="images/about-building.jpg" alt="Trụ sở Minh Cường Steel"></span>
+            <span class="play"><i></i></span>
+          </a>
+        </div>
+        <div class="vd-col-text">
+          <div class="count-text"><p><span class="count-up" data-to="29">29</span></p></div><img class="years" src="images/years.png" alt="Years" width="150" height="47">
+          <p class="vd-desc"><span class="count-up" data-to="29">29</span> năm trong lĩnh vực tư vấn thiết kế, sản xuất và thi công kết cấu thép với mục tiêu: Chất lượng – an toàn – trách nhiệm</p>
+          <a href="{{SITE}}/lien-he/" class="button primary btn-main hide-for-small"><span>Liên hệ tư vấn</span>{{ARROW_RIGHT}}</a>
+          <a href="{{SITE}}/tin-tuc/" class="button primary is-outline btn-main cus-arr show-for-small"><span>Xem thêm</span><i class="arr"></i></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NEWS -->
+  <section class="section tt-ss scale-ss">
+    <div class="container">
+      {{TITLE_NEWS}}
+      <div class="news-row hide-for-medium">
+        <div class="news-col-left" data-animate="fadeInLeft">{{NEWS_LEFT}}</div>
+        <div class="news-col-right" data-animate="fadeInRight">{{NEWS_RIGHT}}</div>
+      </div>
+      <div class="news-slider show-for-medium" data-slider="news">
+        <div class="slider-viewport"><div class="slider-track">{{NEWS_SLIDER}}</div></div>
+        <button class="slider-arrow prev" aria-label="Previous"><svg viewBox="0 0 100 100"><path d="M 10,50 L 60,100 L 70,90 L 30,50 L 70,10 L 60,0 Z" fill="currentColor"/></svg></button>
+        <button class="slider-arrow next" aria-label="Next"><svg viewBox="0 0 100 100"><path d="M 10,50 L 60,100 L 70,90 L 30,50 L 70,10 L 60,0 Z" fill="currentColor" transform="translate(100,100) rotate(180)"/></svg></button>
+      </div>
+      <div class="text-center"><a href="{{SITE}}/tin-tuc/" class="button primary is-outline btn-main cus-arr"><span>Xem thêm</span><i class="arr"></i></a></div>
+    </div>
+  </section>
+
+  <!-- PRODUCTS -->
+  <section class="section bd-ss scale-ss products-ss">
+    <div class="section-bg" style="background-image:url(images/bg-products.jpg)"></div>
+    <div class="container">
+      {{TITLE_PRODUCTS}}
+      <div class="row-ser"><div class="ser-grid">{{PRODUCTS}}</div></div>
+    </div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section class="section dn-ss scale-ss">
+    <div class="container">{{TITLE_PROJECTS}}</div>
+    <div class="tab-cus">
+      <ul class="tabs" role="tablist">
+        <li class="tab active"><a href="#tab-noi-dia" data-tab="noi-dia" role="tab"><span>Dự án nội địa</span></a></li>
+        <li class="tab"><a href="#tab-xuat-khau" data-tab="xuat-khau" role="tab"><span>Xuất khẩu</span></a></li>
+      </ul>
+      <div class="tab-panels">
+        <div class="panel active" id="tab-noi-dia"><div class="slider-center" data-slider="projects"><div class="slick-list"><div class="slick-track">{{PROJECTS_ND}}</div></div></div></div>
+        <div class="panel" id="tab-xuat-khau"><div class="slider-center" data-slider="projects"><div class="slick-list"><div class="slick-track">{{PROJECTS_XK}}</div></div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHY US -->
+  <section class="section bd-ss scale-ss why-ss">
+    <div class="section-bg" style="background-image:url(images/bg-why.jpg)"></div>
+    <div class="container">
+      {{TITLE_WHY}}
+      <div class="col-tab-l">{{WHY}}</div>
+    </div>
+  </section>
+
+  <!-- PARTNERS -->
+  <section class="section scale-ss partners-ss">
+    <div class="container">
+      {{TITLE_PARTNERS}}
+      <div class="gallery-cus2" data-slider="partners">
+        <div class="slider-viewport"><div class="slider-track">{{PARTNERS}}</div></div>
+        <button class="slider-arrow prev" aria-label="Previous"><svg viewBox="0 0 100 100"><path d="M 10,50 L 60,100 L 70,90 L 30,50 L 70,10 L 60,0 Z" fill="currentColor"/></svg></button>
+        <button class="slider-arrow next" aria-label="Next"><svg viewBox="0 0 100 100"><path d="M 10,50 L 60,100 L 70,90 L 30,50 L 70,10 L 60,0 Z" fill="currentColor" transform="translate(100,100) rotate(180)"/></svg></button>
+        <ol class="slider-dots"></ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <div class="contact-row scale-ss">
+    <div class="container">
+      <div class="col-form" data-animate="flipInY">
+        <section class="lh-ss">
+          <div class="section-bg" style="background-image:url(images/bg-contact.png)"></div>
+          <div class="lh-row">
+            <div class="lh-map c-map">
+              <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3721.6076968524267!2d105.84150497508367!3d21.12820098054613!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x313501072fcc2ffb%3A0x6eb3f3dfa316d649!2zTWluaCBDxrDhu51uZyBTdGVlbA!5e0!3m2!1svi!2s!4v1699005003566!5m2!1svi!2s" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Bản đồ Minh Cường Steel"></iframe>
+            </div>
+            <div class="lh-form">
+              <h2>Liên hệ ngay</h2>
+              <form class="contact-form" novalidate>
+                <input type="text" name="your-name" placeholder="Họ tên" required>
+                <input type="email" name="your-email" placeholder="Email">
+                <input type="tel" name="your-phone" placeholder="Số điện thoại" required>
+                <textarea name="your-message" placeholder="Lời nhắn" rows="10"></textarea>
+                <input type="submit" value="Gửi thông tin">
+                <div class="form-response" aria-live="polite"></div>
+              </form>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer id="footer" class="footer-wrapper">
+  <div class="footer-row container-wide">
+    <div class="footer-col footer-col-1 hide-for-small">
+      <div class="footer-brand"><img src="images/logo-footer.svg" alt="" width="73" height="50"><p>CÔNG TY CỔ PHẦN CƠ KHÍ - XÂY LẮP - THƯƠNG MẠI MINH CƯỜNG</p></div>
+      <div class="footer-social">{{SOCIAL}}</div>
+      <div class="has-icon map"><p>Km10, QL3, Cầu Đôi, Xã Đông Anh, Tp. Hà Nội</p></div>
+      <div class="has-icon phone"><p><a href="tel:02438835397">024.3883.5397</a> / <a href="tel:0936078586">093.607.8586</a> / <a href="tel:0913234986">0913.234.986</a></p></div>
+      <div class="has-icon email"><p><a href="mailto:contact@minhcuongsteel.com">contact@minhcuongsteel.com</a></p></div>
+    </div>
+    <div class="footer-col footer-col-1 show-for-small">
+      <div class="footer-brand"><img src="images/logo-footer.svg" alt="" width="73" height="50"><p>CÔNG TY CP CƠ KHÍ XÂY LẮP<br>THƯƠNG MẠI MINH CƯỜNG</p></div>
+      <div class="has-icon map"><p>Km10, QL3, Cầu Đôi, Uy Nỗ, Đông Anh, Hà Nội</p></div>
+      <div class="has-icon phone"><p><a href="tel:02438835397">024.3883.5397</a> / <a href="tel:0936078586">093.607.8586</a> / <a href="tel:0913234986">0913.234.986</a></p></div>
+      <div class="has-icon email"><p><a href="mailto:contact@minhcuongsteel.com">contact@minhcuongsteel.com</a></p></div>
+      <p class="follow"><strong>Follow us on</strong></p>
+      <div class="footer-social">{{SOCIAL}}</div>
+    </div>
+    <div class="footer-col footer-col-2">
+      <p class="footer-title"><strong>Dịch vụ</strong></p>
+      <div class="footer-menu">{{FOOTER_SERVICES}}</div>
+    </div>
+    <div class="footer-col footer-col-3">
+      <p class="footer-title"><strong>Thông tin</strong></p>
+      <div class="footer-menu">{{FOOTER_INFO}}</div>
+    </div>
+    <div class="footer-col footer-col-4">
+      <div class="fb-page">
+        <iframe src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2Fminhcuongsteel.vn&tabs&width=340&height=130&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true&locale=vi_VN" width="340" height="130" title="Minh Cường Steel" loading="lazy" allow="encrypted-media"></iframe>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</div><!-- #wrapper -->
+
+<a href="#top" id="top-link" class="back-to-top" aria-label="Go to top"><svg viewBox="0 0 14 9" width="13" height="9"><path d="M1 8l6-6 6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+
+<!-- Mobile off-canvas menu -->
+<div class="mfp-bg off-canvas" id="menuBg"></div>
+<div class="mfp-wrap off-canvas" id="menuWrap" aria-hidden="true">
+  <div class="mfp-content" id="menuPanel">
+    <div class="sidebar-menu">
+      <ul class="nav-sidebar">
+        {{MOBILE_NAV}}
+        <li class="html lang">{{LANG_MOBILE}}</li>
+        <li class="html"><a href="https://heyzine.com/flip-book/c0f9153ebe.html" target="_blank" rel="noopener" class="button primary btn-profile"><span>Profile</span></a></li>
+        <li class="html"><a href="{{SITE}}/he-thong-nha-may/" class="button secondary btn-factory"><span>HỆ THỐNG NHÀ MÁY</span></a></li>
+      </ul>
+    </div>
+  </div>
+  <button class="mfp-close" id="menuClose" title="Close (Esc)">×</button>
+</div>
+
+<!-- Search lightbox -->
+<div class="mfp-bg" id="searchBg"></div>
+<div class="mfp-wrap lightbox" id="searchWrap" aria-hidden="true">
+  <div class="mfp-content search-content">
+    <form class="searchform" action="{{SITE}}/" method="get" target="_blank">
+      <input type="search" class="search-field" name="s" placeholder="Search…" autocomplete="off">
+      <button type="submit" class="submit-button" aria-label="Submit">{{SEARCH}}</button>
+    </form>
+  </div>
+  <button class="mfp-close" data-close title="Close (Esc)">×</button>
+</div>
+
+<!-- Video lightbox -->
+<div class="mfp-bg" id="videoBg"></div>
+<div class="mfp-wrap lightbox" id="videoWrap" aria-hidden="true">
+  <div class="mfp-content video-content"><div class="mfp-iframe-scaler" id="videoFrame"></div><button class="mfp-close" data-close title="Close (Esc)">×</button></div>
+</div>
+
+<!-- Floating contact buttons -->
+<div id="button-contact-vr">
+  <div id="gom-all-in-one">
+    <div class="button-contact" id="phone-vr"><div class="phone-vr"><div class="phone-vr-circle-fill"></div><div class="phone-vr-img-circle"><a href="tel:0936078586"><img src="images/float-phone.png" alt="Phone"></a></div></div></div>
+    <div class="button-contact" id="contact-vr"><div class="phone-vr"><div class="phone-vr-circle-fill"></div><div class="phone-vr-img-circle"><a href="mailto:contact@minhcuongsteel.com"><img src="images/float-mail.png" alt="Liên hệ"></a></div></div></div>
+    <div class="button-contact" id="fanpage-vr"><div class="phone-vr"><div class="phone-vr-circle-fill"></div><div class="phone-vr-img-circle"><a href="https://www.facebook.com/minhcuongsteel.vn" target="_blank" rel="noopener"><img src="images/social/facebook.svg" alt="Fanpage"></a></div></div></div>
+    <div class="button-contact" id="zalo-vr"><div class="phone-vr"><div class="phone-vr-circle-fill"></div><div class="phone-vr-img-circle"><a href="https://zalo.me/0936078586" target="_blank" rel="noopener"><img src="images/float-zalo.png" alt="Zalo"></a></div></div></div>
+  </div>
+</div>
+
+<script src="js/main.js"></script>
+</body>
+</html>
