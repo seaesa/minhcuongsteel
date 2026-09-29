@@ -354,14 +354,43 @@ a.btn-main.button { min-width: 160px; height: 43px; line-height: 43px; min-heigh
 .video-cus .img-inner { position: relative; display: block; padding-top: 100%; }
 .video-cus .img-inner img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 999px; transition: filter .6s, opacity .6s, transform .6s; }
 .video-cus .img-inner::after { content: url("../images/theme/dots.png"); position: absolute; bottom: -80px; left: 0; z-index: -1; }
-.video-cus .play { position: absolute; left: 50%; top: 100%; width: 100px; height: 117px; margin-left: -50px; margin-top: -54px; line-height: 0; transition: transform .2s, opacity .2s; }
-.video-cus:hover .play { transform: scale(1.15); }
+/* play button: sits on the circle's bottom edge, white ring cuts into the photo so it reads as part of the frame */
+.video-cus .play {
+  position: absolute;
+  left: 50%; top: 100%;
+  z-index: 2;
+  width: 84px; height: 84px;
+  margin: -42px 0 0 -42px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  background: var(--primary);
+  box-shadow: 0 0 0 6px #fff, 0 10px 24px rgba(252, 114, 0, .35);
+  transition: transform .3s ease, background .3s ease, box-shadow .3s ease;
+}
+.video-cus .play::before {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 2px solid var(--primary);
+  animation: playPulse 2s ease-out infinite;
+  pointer-events: none;
+}
 .video-cus .play i {
   display: block;
-  width: 100px; height: 100px;
-  background: url("../images/theme/play.png") center / contain no-repeat;
-  animation: phone-vr-circle-fill 1s ease-in-out infinite;
+  width: 0; height: 0;
+  margin-left: 6px;
+  border-top: 14px solid transparent;
+  border-bottom: 14px solid transparent;
+  border-left: 22px solid #fff;
 }
+.video-cus:hover .play { transform: scale(1.08); background: var(--accent); box-shadow: 0 0 0 6px #fff, 0 10px 24px rgba(255, 0, 0, .35); }
+.video-cus:hover .play::before { border-color: var(--accent); }
+@keyframes playPulse {
+  0% { transform: scale(1); opacity: .7; }
+  100% { transform: scale(1.45); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) { .video-cus .play::before { animation: none; } }
 .vd-col-text { padding-left: 95px; padding-top: 20px; color: #121212; }
 .count-text { display: inline-block; width: 188px; margin-right: 20px; }
 .count-text p { display: inline-block; margin: 0; color: var(--accent); font-family: "Frakturika Spamless", serif; font-size: 200px; line-height: 160px; }
@@ -997,8 +1026,10 @@ footer a:hover { transform: translateX(2px); color: var(--accent) !important; }
   .video-cus .rings::before { right: 98%; }
   .video-cus .rings::after { right: -8%; top: 3%; }
   .video-cus .img-inner::after { bottom: -445px; left: auto; right: -137px; z-index: 2; }
-  .video-cus .play { width: 31px; height: 48px; margin-left: -15.5px; margin-top: -18px; }
-  .video-cus .play i { width: 31px; height: 31px; }
+  .video-cus .play { width: 48px; height: 48px; margin: -24px 0 0 -24px; box-shadow: 0 0 0 4px #fff, 0 6px 14px rgba(252, 114, 0, .35); }
+  .video-cus:hover .play { box-shadow: 0 0 0 4px #fff, 0 6px 14px rgba(255, 0, 0, .35); }
+  .video-cus .play::before { inset: -4px; }
+  .video-cus .play i { margin-left: 4px; border-top-width: 8px; border-bottom-width: 8px; border-left-width: 13px; }
   .vd-col-text { padding-top: 60px; }
   .count-text { width: calc(100% - 186px); margin: 0 0 0 42px; }
   .count-text p { font-size: 173px; line-height: 100px; }
