@@ -398,9 +398,25 @@
       move: function (dx) { self.setX(self.baseX() + dx); },
       end: function (dx) { self.go(self.cur + (dx < 0 ? 1 : -1)); self.start(); }
     });
+    var panel = root.closest('.panel');
+    this.panel = panel;
+    var prevBtn = $('.proj-nav.prev', panel), nextBtn = $('.proj-nav.next', panel);
+    if (prevBtn) prevBtn.addEventListener('click', function () { self.go(self.cur - 1); self.start(); });
+    if (nextBtn) nextBtn.addEventListener('click', function () { self.go(self.cur + 1); self.start(); });
+    [prevBtn, nextBtn].forEach(function (b) {
+      if (!b) return;
+      b.addEventListener('mouseenter', function () { self.paused = true; });
+      b.addEventListener('mouseleave', function () { self.paused = false; });
+    });
     this.layout();
     this.start();
   }
+  CenterSlider.prototype.alignNav = function () {
+    var cur = this.track.querySelector('.project-slide.is-current .project-image');
+    if (!cur || !this.panel.offsetParent) return;
+    var img = cur.getBoundingClientRect(), p = this.panel.getBoundingClientRect();
+    this.panel.style.setProperty('--nav-top', Math.round(img.top + img.height / 2 - p.top) + 'px');
+  };
   CenterSlider.prototype.show = function () { return isSmall() ? 1 : 3; };
   CenterSlider.prototype.width = function () {
     var cs = getComputedStyle(this.list);
@@ -424,9 +440,15 @@
     this.track.classList.remove('animate');
     this.setX(this.baseX());
     this.mark();
+    var self = this;
+    clearTimeout(this.alignTimer);
+    this.alignTimer = setTimeout(function () { self.alignNav(); }, 560);
   };
   CenterSlider.prototype.go = function (i) {
     var self = this;
+    if (this.busy) return;
+    this.busy = true;
+    setTimeout(function () { self.busy = false; }, 540);
     this.cur = i;
     this.track.classList.add('animate');
     this.setX(this.baseX());
@@ -476,17 +498,53 @@
      Why choose us – icon tabs
      ------------------------------------------------------------------ */
   var tabs = $$('.icon-tab');
-  function activateTab(tab) {
+  var tabWrap = $('.col-tab-l');
+  var pointer = document.createElement('span');
+  pointer.className = 'why-pointer no-anim';
+  tabWrap.appendChild(pointer);
+  var panelOf = function (t) { return $('#why-' + t.getAttribute('data-tab')); };
+
+  function placePointer(tab, animate) {
+    if (isSmall()) return;
+    var panel = panelOf(tab);
+    pointer.classList.toggle('no-anim', !animate);
+    pointer.style.left = (panel.offsetLeft - 12) + 'px';
+    pointer.style.top = (tab.offsetTop + tab.offsetHeight / 2 - 12) + 'px';
+  }
+  function openAccordion(panel, open) {
+    if (open) {
+      panel.style.maxHeight = (panel.scrollHeight + 60) + 'px';
+    } else {
+      panel.style.maxHeight = panel.scrollHeight + 'px';
+      void panel.offsetHeight;
+      panel.style.maxHeight = '0px';
+    }
+  }
+  function activateTab(tab, animate) {
     tabs.forEach(function (t) {
-      var on = t === tab;
+      var on = t === tab, panel = panelOf(t), was = panel.classList.contains('active');
+      if (isSmall() && was !== on) openAccordion(panel, on);
       t.classList.toggle('active', on);
-      $('#why-' + t.getAttribute('data-tab')).classList.toggle('active', on);
+      panel.classList.toggle('active', on);
     });
+    placePointer(tab, animate !== false);
+  }
+  function syncWhyLayout() {
+    var active = $('.icon-tab.active') || tabs[0];
+    tabs.forEach(function (t) {
+      var panel = panelOf(t);
+      if (isSmall()) panel.style.maxHeight = t === active ? (panel.scrollHeight + 60) + 'px' : '0px';
+      else panel.style.maxHeight = '';
+    });
+    placePointer(active, false);
   }
   tabs.forEach(function (t) {
-    t.addEventListener('click', function () { activateTab(t); });
+    t.addEventListener('click', function () { if (!t.classList.contains('active')) activateTab(t); });
     t.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activateTab(t); } });
   });
+  syncWhyLayout();
+  window.addEventListener('resize', syncWhyLayout);
+  window.addEventListener('load', syncWhyLayout);
 
   /* ------------------------------------------------------------------
      Contact form (front-end validation, CF7-like messages)
