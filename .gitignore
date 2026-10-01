@@ -4,3 +4,6 @@ node_modules/
 .DS_Store
 .vercel
 .env*
+
+# scraper cache
+data/cache/

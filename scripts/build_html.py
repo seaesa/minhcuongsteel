@@ -1,7 +1,13 @@
-"""Generates index.html from section templates + data lists."""
+"""Builds every page of the clone: the home page (template.html + data lists below),
+the about page (page-gioi-thieu.html) and all inner pages from site_pages.py."""
 from pathlib import Path
+import json
 import re
 import html
+import sys
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from site_pages import Page, IMAGES, norm, build_pages, project_index  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 SITE = "https://minhcuongsteel.com"
@@ -92,15 +98,15 @@ PROJECTS_ND = [
     ("Dự án Nhà máy sản xuất máy biến áp, tủ bảng điện – Công ty HBT", "/du-an/nha-may-san-xuat-may-bien-ap/"),
 ]
 PROJECTS_XK = [
-    ("Dự án Công ty TNHH thực phẩm ORION Vina", "/du-an/"),
-    ("Dự án Interflex Vina", "/du-an/"),
-    ("Nhà máy sản xuất bao bì giấy và đồ nhựa Depak", "/du-an/"),
-    ("Dự Án LG Electronics", "/du-an/"),
-    ("Jeil Logistics Hải Phòng", "/du-an/"),
-    ("Dự án Woonyoung Vina", "/du-an/"),
-    ("Dự án LG Innotek V3 Project", "/du-an/"),
-    ("Top các dự án nước ngoài nổi bật khác được triển khai bởi Minh Cường Steel", "/du-an/"),
-    ("Minh Cường Steel xuất khẩu thành công Ván khuôn &amp; Đà giáo sang thị trường Singapore", "/du-an/"),
+    ("Dự án Công ty TNHH thực phẩm ORION Vina", "/du-an/du-an-cong-ty-tnhh-thuc-pham-orion-vina/"),
+    ("Dự án Interflex Vina", "/du-an/du-an-interflex-vina/"),
+    ("Nhà máy sản xuất bao bì giấy và đồ nhựa Depak", "/du-an/nha-may-san-xuat-bao-bi-giay-va-do-nhua-depak/"),
+    ("Dự Án LG Electronics", "/du-an/du-an-lg-electronics/"),
+    ("Jeil Logistics Hải Phòng", "/du-an/jeil-logistics-hai-phong/"),
+    ("Dự án Woonyoung Vina", "/du-an/du-an-woonyoung-vina/"),
+    ("Dự án LG Innotek V3 Project", "/du-an/du-an-lg-innotek-v3-project/"),
+    ("Top các dự án nước ngoài nổi bật khác được triển khai bởi Minh Cường Steel", "/du-an/top-cac-du-an-nuoc-ngoai-noi-bat-khac-duoc-trien-khai-boi-minh-cuong-steel/"),
+    ("Minh Cường Steel xuất khẩu thành công Ván khuôn &amp; Đà giáo sang thị trường Singapore", "/du-an/xuat-khau-van-khuon-da-giao/"),
     ("Xuất khẩu thành công Ván khuôn xà mũ và Ván khuôn cột sang thị trường Australia", "/du-an/van-khuon-xa-mu-van-khuon-cot/"),
     ("Dự án công ty tnhh Welvista", "/du-an/du-an-cong-ty-tnhh-welvista/"),
     ("Nhà máy HuaYuan Machinery Việt Nam", "/du-an/nha-may-huayuan-machinery-viet-nam/"),
@@ -271,9 +277,6 @@ def cert_cells(items, group, alt):
     )
 
 
-# built pages: original URL -> local file (everything else on the original site becomes "#")
-PAGES = {f"{SITE}/gioi-thieu/": "gioi-thieu.html"}
-
 layout = (ROOT / "scripts/template.html").read_text(encoding="utf-8")
 replacements = {
     "{{DESKTOP_NAV}}": desktop_nav(),
@@ -307,30 +310,61 @@ replacements = {
     "{{TITLE_PARTNERS}}": title("Đối tác của chúng tôi"),
 }
 
+# every page of the clone, keyed by site path ("/tin-tuc/", "/du-an/page/2/" ...)
+pages = [Page("/", "Thép minh cường - CÔNG TY CỔ PHẦN CƠ KHÍ XÂY LẮP THƯƠNG MẠI MINH CƯỜNG", "", "", None),
+         Page("/gioi-thieu/", "Giới thiệu - Thép minh cường", "page-transparent page-about", "Giới thiệu",
+              (ROOT / "scripts/page-gioi-thieu.html").read_text(encoding="utf-8"))]
+pages += build_pages()
+BUILT = {p.path for p in pages}
+ORIGIN = re.compile(r'(href|action|src)="(?:https?://minhcuongsteel\.com)(/[^"]*)?"')
 
-def render(page, active=None):
+
+def local_link(m):
+    attr, path = m.group(1), m.group(2) or "/"
+    if attr == "src":
+        return f'{attr}="{IMAGES.get("https://minhcuongsteel.com" + path, "https://minhcuongsteel.com" + path)}"'
+    clean = norm(path)
+    if clean in BUILT:
+        return f'{attr}="{clean}"'
+    if re.search(r"\.(jpe?g|png|webp|gif)$", path, re.I):
+        return f'{attr}="{IMAGES.get("https://minhcuongsteel.com" + path, "https://minhcuongsteel.com" + path)}"'
+    # pages that do not exist in the clone: keep users on this site
+    return f'{attr}="#"'
+
+
+def mark_active(page, label):
+    if not label:
+        return page
+    label = re.escape(label)
+    page = re.sub(r'<li class="menu-item((?: has-dropdown)?)"><a class="nav-top-link" (href="[^"]*">' + label + ")",
+                  r'<li class="menu-item\1 active"><a class="nav-top-link" \2', page, count=1)
+    return re.sub(r'<li class="menu-item((?: has-child)?)"><a (href="[^"]*">' + label + "<)",
+                  r'<li class="menu-item\1 active"><a \2', page, count=1)
+
+
+def render(p):
+    page = layout
+    if p.main is not None:
+        page = re.sub(r'(<main id="main">)[\s\S]*?(</main>)', lambda m: m.group(1) + "\n\n" + p.main + "\n" + m.group(2), page, count=1)
+    page = re.sub(r"<title>[^<]*</title>", lambda m: f"<title>{p.title}</title>", page, count=1)
+    page = page.replace("{{BODY_CLASS}}", f' class="{p.body_class}"' if p.body_class else "")
     for k, v in replacements.items():
         page = page.replace(k, v)
-    for url, local in PAGES.items():
-        page = page.replace(f'"{url}"', f'"{local}"')
     page = page.replace("{{SITE}}", SITE)
-    # pages not built yet: keep users on this site instead of sending them to the original
-    page = re.sub(r'(href|action)="' + re.escape(SITE) + r'[^"]*"', r'\1="#"', page)
-    if active:
-        # highlight the current page in desktop + mobile menus
-        page = re.sub(r'<li class="menu-item((?: has-[a-z-]+)?)"><a( class="nav-top-link")? href="' + re.escape(active) + '"',
-                      lambda m: f'<li class="menu-item{m.group(1)} active"><a{m.group(2) or ""} href="{active}"', page)
-    return page
+    page = ORIGIN.sub(local_link, page)
+    # root-relative links to pages that are not part of the clone (they come from post content)
+    page = re.sub(r'href="(/[^"#?]*/)"', lambda m: m.group(0) if norm(m.group(1)) in BUILT else 'href="#"', page)
+    # assets are referenced from the site root so nested pages work
+    page = re.sub(r'(src|href)="(css|js|images|fonts)/', r'\1="/\2/', page)
+    page = page.replace('url(images/', 'url(/images/').replace('href="index.html"', 'href="/"')
+    return mark_active(page, p.nav)
 
 
-home = render(layout.replace("{{BODY_CLASS}}", ""))
-(ROOT / "index.html").write_text(home, encoding="utf-8")
-print("index.html written", len(home))
-
-about_main = (ROOT / "scripts/page-gioi-thieu.html").read_text(encoding="utf-8")
-about = re.sub(r'(<main id="main">)[\s\S]*?(</main>)', lambda m: m.group(1) + "\n\n" + about_main + "\n" + m.group(2), layout, count=1)
-about = re.sub(r"<title>[^<]*</title>", "<title>Giới thiệu - Thép minh cường</title>", about, count=1)
-about = about.replace("{{BODY_CLASS}}", ' class="page-transparent page-about"')
-about = render(about, active="gioi-thieu.html")
-(ROOT / "gioi-thieu.html").write_text(about, encoding="utf-8")
-print("gioi-thieu.html written", len(about))
+written = 0
+for p in pages:
+    out = ROOT / "index.html" if p.path == "/" else ROOT / p.path.strip("/") / "index.html"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(render(p), encoding="utf-8")
+    written += 1
+(ROOT / "data/projects-index.json").write_text(json.dumps(project_index(), ensure_ascii=False), encoding="utf-8")
+print("pages written:", written)

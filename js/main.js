@@ -103,7 +103,7 @@
   var lang = currentLang();
   $$('.gt-switcher').forEach(function (sw) {
     var sel = $('.gt-selected img', sw);
-    sel.src = 'images/flags/' + lang + '.svg';
+    sel.src = '/images/flags/' + lang + '.svg';
     sel.alt = lang;
     $$('.gt-options a', sw).forEach(function (a) {
       a.classList.toggle('gt-current', a.getAttribute('data-lang') === lang);
@@ -640,6 +640,127 @@
   syncWhyLayout();
   window.addEventListener('resize', syncWhyLayout);
   window.addEventListener('load', syncWhyLayout);
+  }
+
+  /* ------------------------------------------------------------------
+     Project cards: main image (slick, speed 500) synced with 3 centred
+     thumbnails (centerMode, focusOnSelect) + one dot per image
+     ------------------------------------------------------------------ */
+  function ProjectSlider(root) {
+    var self = this;
+    this.root = root;
+    this.track = $('.pj-track', root);
+    this.ttrack = $('.pj-ttrack', root);
+    this.dots = $('.pj-dots', root);
+    this.n = this.track.children.length;
+    this.cur = 0;
+    if (this.n < 2) { $('.pj-thumbs', root).style.display = 'none'; return; }
+    // clones so both strips can wrap seamlessly: main gets 1 per side, thumbs 2 per side
+    var mFirst = this.track.firstElementChild.cloneNode(true), mLast = this.track.lastElementChild.cloneNode(true);
+    this.track.appendChild(mFirst); this.track.insertBefore(mLast, this.track.firstChild);
+    var thumbs = Array.prototype.slice.call(this.ttrack.children);
+    thumbs.slice(-2).reverse().forEach(function (t) { self.ttrack.insertBefore(t.cloneNode(true), self.ttrack.firstChild); });
+    thumbs.slice(0, 2).forEach(function (t) { self.ttrack.appendChild(t.cloneNode(true)); });
+    Array.prototype.forEach.call(this.ttrack.children, function (t, k) {
+      t.addEventListener('click', function () { if (!self.dragged) self.go(self.cur + (k - 2 - self.mod(self.cur)) ); });
+    });
+    for (var i = 0; i < this.n; i++) {
+      var li = document.createElement('li');
+      (function (k) { li.addEventListener('click', function () { self.go(k); }); })(i);
+      this.dots.appendChild(li);
+    }
+    attachDrag($('.pj-main', root), {
+      start: function () { self.track.classList.remove('animate'); },
+      move: function (dx) { self.track.style.transform = 'translate3d(' + (self.mainX() + dx) + 'px,0,0)'; },
+      end: function (dx) { self.go(self.cur + (dx < 0 ? 1 : -1)); }
+    });
+    window.addEventListener('resize', function () { self.place(false); });
+    this.place(false);
+  }
+  ProjectSlider.prototype.mod = function (i) { return ((i % this.n) + this.n) % this.n; };
+  ProjectSlider.prototype.mainX = function () { return -(this.cur + 1) * this.track.parentNode.clientWidth; };
+  ProjectSlider.prototype.place = function (animate) {
+    var w = this.ttrack.parentNode.clientWidth / 3;
+    this.track.classList.toggle('animate', animate);
+    this.ttrack.classList.toggle('animate', animate);
+    this.track.style.transform = 'translate3d(' + this.mainX() + 'px,0,0)';
+    // centre mode: the current thumbnail sits in the middle of the three
+    this.ttrack.style.transform = 'translate3d(' + (-(this.cur + 1) * w) + 'px,0,0)';
+    var real = this.mod(this.cur);
+    Array.prototype.forEach.call(this.dots.children, function (d, k) { d.classList.toggle('is-selected', k === real); });
+  };
+  ProjectSlider.prototype.go = function (i) {
+    var self = this;
+    if (this.busy) return;
+    this.busy = true;
+    this.cur = i;
+    this.place(true);
+    setTimeout(function () {
+      self.busy = false;
+      var real = self.mod(self.cur);
+      if (real !== self.cur) { self.cur = real; self.place(false); }
+    }, 520);
+  };
+  function initProjectSliders(scope) {
+    $$('[data-pj-slider]', scope).forEach(function (r) { if (!r.pj) r.pj = new ProjectSlider(r); });
+  }
+  initProjectSliders(document);
+
+  /* ------------------------------------------------------------------
+     Project search (/du-an/?key=...&loai-cong-trinh=...), filtered client-side
+     ------------------------------------------------------------------ */
+  var pjList = $('[data-pj-list]');
+  var params = new URLSearchParams(location.search);
+  var pjKey = (params.get('key') || '').trim(), pjType = params.get('loai-cong-trinh') || '';
+  $$('.handle_search_duan').forEach(function (f) {
+    $('.search_handle_duan', f).value = pjKey;
+    $('.search_loaicongtrinh', f).value = pjType;
+  });
+  if (pjList && (pjKey || pjType)) {
+    var fold = function (t) { return t.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').toLowerCase(); };
+    fetch('/data/projects-index.json').then(function (r) { return r.json(); }).then(function (all) {
+      var q = fold(pjKey);
+      var hits = all.filter(function (p) { return (!pjType || p.k === pjType) && (!q || fold(p.t).indexOf(q) > -1); });
+      pjList.innerHTML = hits.length ? hits.map(function (p) { return p.h; }).join('') : '<p class="pj-empty">Không tìm thấy dự án phù hợp.</p>';
+      initProjectSliders(pjList);
+    });
+  }
+
+  /* ------------------------------------------------------------------
+     Factory system map: list <-> map tabs, contact toggle, province filter
+     ------------------------------------------------------------------ */
+  var mapBox = $('.map-tong');
+  if (mapBox) {
+    var bindMap = function () {
+      $$('.vmap-item', mapBox).forEach(function (item) {
+        $('h3', item).addEventListener('click', function () {
+          var k = item.getAttribute('data-map');
+          $$('.vmap-item', mapBox).forEach(function (x) { x.classList.toggle('active', x === item); });
+          $$('.vmap-map', mapBox).forEach(function (m) {
+            var on = m.getAttribute('data-map') === k;
+            m.classList.toggle('active', on);
+            var f = $('iframe', m);
+            if (on && f && f.dataset.src) { f.src = f.dataset.src; delete f.dataset.src; }
+          });
+        });
+        $('.vmap-toggle', item).addEventListener('click', function () { item.classList.toggle('open'); });
+      });
+    };
+    var original = { list: $('.vmap-left--main', mapBox).innerHTML, maps: $('.vmap-right', mapBox).innerHTML };
+    $('.vmap-select', mapBox).addEventListener('change', function () {
+      var tpl = this.value && $('template[data-province="' + this.value + '"]', mapBox);
+      if (!this.value) {
+        $('.vmap-left--main', mapBox).innerHTML = original.list;
+        $('.vmap-right', mapBox).innerHTML = original.maps;
+      } else {
+        var frag = tpl.content;
+        var list = frag.querySelector('.vmap-list'), maps = frag.querySelector('.vmap-maps');
+        $('.vmap-left--main', mapBox).innerHTML = list.children.length ? list.outerHTML : '';
+        $('.vmap-right', mapBox).innerHTML = maps.children.length ? maps.outerHTML : original.maps;
+      }
+      bindMap();
+    });
+    bindMap();
   }
 
   /* ------------------------------------------------------------------

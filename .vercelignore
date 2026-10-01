@@ -1,0 +1,8 @@
+# build inputs / research, not part of the static site
+docs/
+scripts/
+data/cache/
+data/site.json
+data/images.json
+image.png
+node_modules/
