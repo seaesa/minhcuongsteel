@@ -251,7 +251,30 @@ def social():
 
 left, right, slider = news()
 
-page = (ROOT / "scripts/template.html").read_text(encoding="utf-8")
+# ---------------------------------------------------------------------------
+# Giới thiệu page data
+# ---------------------------------------------------------------------------
+AWARDS = [("award-1", ".jpg"), ("award-2", ".jpg"), ("award-3", ".jpg"), ("award-4", ".jpg"), ("award-5", ".jpg")]
+CERTS = [("cert-1", ".png"), ("cert-2", ".png"), ("cert-3", ".jpg"), ("cert-4", ".png"), ("cert-5", ".png")]
+NAV_ARROW = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="{d}" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+CERT_NAV = (
+    f'<button class="proj-nav prev" type="button" aria-label="Trước">{NAV_ARROW.format(d="M15 5l-7 7 7 7")}</button>'
+    f'<button class="proj-nav next" type="button" aria-label="Tiếp theo">{NAV_ARROW.format(d="M9 5l7 7-7 7")}</button>'
+)
+
+
+def cert_cells(items, group, alt):
+    return "".join(
+        f'<div class="cert-col"><a class="cert-box" href="images/about/{n}-full{ext}" data-lightbox="{group}" aria-label="{alt} {i + 1}">'
+        f'<img src="images/about/{n}{ext}" alt="{alt} {i + 1}" loading="lazy"><span class="overlay"></span></a></div>'
+        for i, (n, ext) in enumerate(items)
+    )
+
+
+# built pages: original URL -> local file (everything else on the original site becomes "#")
+PAGES = {f"{SITE}/gioi-thieu/": "gioi-thieu.html"}
+
+layout = (ROOT / "scripts/template.html").read_text(encoding="utf-8")
 replacements = {
     "{{DESKTOP_NAV}}": desktop_nav(),
     "{{MOBILE_NAV}}": mobile_nav(),
@@ -267,6 +290,9 @@ replacements = {
     "{{PROJECTS_XK}}": projects(PROJECTS_XK, "xuat-khau"),
     "{{WHY}}": why(),
     "{{PARTNERS}}": partners(),
+    "{{AWARDS}}": cert_cells(AWARDS, "awards", "Chứng nhận, giải thưởng"),
+    "{{CERTS}}": cert_cells(CERTS, "certs", "Chứng chỉ"),
+    "{{CERT_NAV}}": CERT_NAV,
     "{{FOOTER_SERVICES}}": footer_links(FOOTER_SERVICES),
     "{{FOOTER_INFO}}": footer_links(FOOTER_INFO),
     "{{SOCIAL}}": social(),
@@ -279,11 +305,32 @@ replacements = {
     "{{TITLE_PROJECTS}}": title("Dự án tiêu biểu"),
     "{{TITLE_WHY}}": title("Vì Sao Khách Hàng Chọn Chúng Tôi"),
     "{{TITLE_PARTNERS}}": title("Đối tác của chúng tôi"),
-    "{{SITE}}": SITE,
 }
-for k, v in replacements.items():
-    page = page.replace(k, v)
-# pages not built yet: keep users on this site instead of sending them to the original
-page = re.sub(r'(href|action)="' + re.escape(SITE) + r'[^"]*"', r'\1="#"', page)
-(ROOT / "index.html").write_text(page, encoding="utf-8")
-print("index.html written", len(page))
+
+
+def render(page, active=None):
+    for k, v in replacements.items():
+        page = page.replace(k, v)
+    for url, local in PAGES.items():
+        page = page.replace(f'"{url}"', f'"{local}"')
+    page = page.replace("{{SITE}}", SITE)
+    # pages not built yet: keep users on this site instead of sending them to the original
+    page = re.sub(r'(href|action)="' + re.escape(SITE) + r'[^"]*"', r'\1="#"', page)
+    if active:
+        # highlight the current page in desktop + mobile menus
+        page = re.sub(r'<li class="menu-item((?: has-[a-z-]+)?)"><a( class="nav-top-link")? href="' + re.escape(active) + '"',
+                      lambda m: f'<li class="menu-item{m.group(1)} active"><a{m.group(2) or ""} href="{active}"', page)
+    return page
+
+
+home = render(layout.replace("{{BODY_CLASS}}", ""))
+(ROOT / "index.html").write_text(home, encoding="utf-8")
+print("index.html written", len(home))
+
+about_main = (ROOT / "scripts/page-gioi-thieu.html").read_text(encoding="utf-8")
+about = re.sub(r'(<main id="main">)[\s\S]*?(</main>)', lambda m: m.group(1) + "\n\n" + about_main + "\n" + m.group(2), layout, count=1)
+about = re.sub(r"<title>[^<]*</title>", "<title>Giới thiệu - Thép minh cường</title>", about, count=1)
+about = about.replace("{{BODY_CLASS}}", ' class="page-transparent page-about"')
+about = render(about, active="gioi-thieu.html")
+(ROOT / "gioi-thieu.html").write_text(about, encoding="utf-8")
+print("gioi-thieu.html written", len(about))

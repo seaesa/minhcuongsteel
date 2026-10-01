@@ -139,6 +139,40 @@
   }
 
   /* ------------------------------------------------------------------
+     Frame corners (border morphing): two dashes on a rounded-rect path.
+     Final dash positions = the ┐ (top-right) and └ (bottom-left) brackets;
+     on reveal they run one lap clockwise and bend through every corner.
+     ------------------------------------------------------------------ */
+  var SVGNS = 'http://www.w3.org/2000/svg';
+  $$('.frame-orbit').forEach(function (box) {
+    var svg = document.createElementNS(SVGNS, 'svg');
+    var rect = document.createElementNS(SVGNS, 'rect');
+    rect.setAttribute('class', 'frame-path');
+    svg.appendChild(rect);
+    box.appendChild(svg);
+    function layout() {
+      var cs = getComputedStyle(box);
+      var num = function (v) { return parseFloat(cs.getPropertyValue(v)) || 0; };
+      var cb = num('--cb'), cw = num('--cw') - cb / 2, ch = num('--ch') - cb / 2;
+      var w = box.clientWidth - cb, h = box.clientHeight - cb;
+      var r = Math.min(num('--cr'), cw, ch);
+      rect.setAttribute('x', cb / 2); rect.setAttribute('y', cb / 2);
+      rect.setAttribute('width', w); rect.setAttribute('height', h);
+      rect.setAttribute('rx', r); rect.setAttribute('ry', r);
+      rect.style.strokeWidth = cb + 'px';
+      // rect path starts after the top-left arc and runs clockwise
+      var P = 2 * (w + h) - (8 - 2 * Math.PI) * r;
+      var L = (cw - r) + Math.PI * r / 2 + (ch - r);   // straight arm + corner arc + straight arm
+      var s1 = w - r - cw;                              // start of the top-right bracket
+      rect.style.strokeDasharray = L + ' ' + (P / 2 - L);
+      rect.style.setProperty('--off-end', -s1 + 'px');
+      rect.style.setProperty('--off-start', (P - s1) + 'px');
+    }
+    layout();
+    window.addEventListener('resize', layout);
+  });
+
+  /* ------------------------------------------------------------------
      Scroll reveal ([data-animate])
      ------------------------------------------------------------------ */
   var revealEls = $$('[data-animate], [data-reveal]').filter(function (el) { return !el.closest('.hero-slide'); });
@@ -372,6 +406,57 @@
     new Slider(root, { autoPlay: 0, group: function () { return isSmall() ? 3 : 4; } });
   });
 
+  // certificates / awards (about page): 3 per page (2 on small), autoplay 2s
+  $$('[data-slider="certs"]').forEach(function (root) {
+    var slider = new Slider(root, { autoPlay: 2000, pauseOnHover: true, group: function () { return isSmall() ? 2 : 3; } });
+    var wrap = root.parentNode;
+    var prev = $('.proj-nav.prev', wrap), next = $('.proj-nav.next', wrap);
+    if (prev) prev.addEventListener('click', function () { slider.go(slider.index - 1); slider.restart(); });
+    if (next) next.addEventListener('click', function () { slider.go(slider.index + 1); slider.restart(); });
+    [prev, next].forEach(function (b) {
+      if (!b) return;
+      b.addEventListener('mouseenter', function () { slider.paused = true; });
+      b.addEventListener('mouseleave', function () { slider.paused = false; });
+    });
+  });
+
+  /* ------------------------------------------------------------------
+     Image lightbox ([data-lightbox] groups, clones ignored)
+     ------------------------------------------------------------------ */
+  var imageBg = $('#imageBg'), imageWrap = $('#imageWrap');
+  if (imageWrap) {
+    var imageFull = $('#imageFull'), imageCounter = $('#imageCounter');
+    var lbItems = [], lbIndex = 0;
+    var lbShow = function (i) {
+      lbIndex = (i + lbItems.length) % lbItems.length;
+      imageFull.src = lbItems[lbIndex].getAttribute('href');
+      imageFull.alt = lbItems[lbIndex].getAttribute('aria-label') || '';
+      imageCounter.textContent = (lbIndex + 1) + ' of ' + lbItems.length;
+    };
+    document.addEventListener('click', function (e) {
+      var a = e.target.closest && e.target.closest('a[data-lightbox]');
+      if (!a) return;
+      e.preventDefault();
+      var group = a.getAttribute('data-lightbox');
+      lbItems = $$('a[data-lightbox="' + group + '"]').filter(function (x) { return !x.closest('.is-clone'); });
+      var start = lbItems.indexOf(a);
+      if (start < 0) start = lbItems.map(function (x) { return x.getAttribute('href'); }).indexOf(a.getAttribute('href'));
+      $$('.mfp-arrow', imageWrap).forEach(function (b) { b.hidden = lbItems.length < 2; });
+      lbShow(Math.max(0, start));
+      showPopup(imageBg, imageWrap, function () { imageFull.src = 'data:,'; });
+    });
+    $('.mfp-arrow.prev', imageWrap).addEventListener('click', function () { lbShow(lbIndex - 1); });
+    $('.mfp-arrow.next', imageWrap).addEventListener('click', function () { lbShow(lbIndex + 1); });
+    imageWrap.addEventListener('click', function (e) { if (e.target === imageWrap) closePopup(); });
+    imageBg.addEventListener('click', closePopup);
+    $('[data-close]', imageWrap).addEventListener('click', closePopup);
+    document.addEventListener('keydown', function (e) {
+      if (!openPopup || openPopup.wrap !== imageWrap) return;
+      if (e.key === 'ArrowLeft') lbShow(lbIndex - 1);
+      if (e.key === 'ArrowRight') lbShow(lbIndex + 1);
+    });
+  }
+
   /* ------------------------------------------------------------------
      Projects – slick centre mode (autoplay 2s, speed 500)
      ------------------------------------------------------------------ */
@@ -500,6 +585,8 @@
      ------------------------------------------------------------------ */
   var tabs = $$('.icon-tab');
   var tabWrap = $('.col-tab-l');
+  if (tabWrap) initWhyTabs();
+  function initWhyTabs() {
   var pointer = document.createElement('span');
   pointer.className = 'why-pointer no-anim';
   tabWrap.appendChild(pointer);
@@ -553,6 +640,7 @@
   syncWhyLayout();
   window.addEventListener('resize', syncWhyLayout);
   window.addEventListener('load', syncWhyLayout);
+  }
 
   /* ------------------------------------------------------------------
      Contact form (front-end validation, CF7-like messages)
