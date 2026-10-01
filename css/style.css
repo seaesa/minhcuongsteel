@@ -146,6 +146,14 @@ a.btn-main.button { min-width: 160px; height: 43px; line-height: 43px; min-heigh
   [data-animate] + [data-animate] + [data-animate] + [data-animate] + [data-animate] { transition-delay: .8s; }
   .hero-slide:not(.is-selected) [data-animated="true"] { transition: transform .7s, opacity .3s !important; }
   /* video section: the two arcs spin one full turn when the image scrolls into view */
+  /* products frame corners slide in from the left, then settle in place */
+  .row-ser::before, .row-ser::after {
+    opacity: 0;
+    transform: translate3d(-300px, 0, 0);
+    transition: transform 1.4s cubic-bezier(.22, .61, .36, 1), opacity .8s ease;
+  }
+  .row-ser:has(.reveal-mark.top.is-revealed)::before,
+  .row-ser:has(.reveal-mark.bottom.is-revealed)::after { opacity: 1; transform: none; }
   .vd-col-img[data-animated="true"] .video-cus .rings { animation: ringSpin 1.6s cubic-bezier(.45, .05, .25, 1) .2s 1 both; }
 }
 @keyframes ringSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
@@ -456,6 +464,9 @@ a.btn-main.button { min-width: 160px; height: 43px; line-height: 43px; min-heigh
    Products / services
    --------------------------------------------------------------------- */
 .row-ser { position: relative; margin: 0 -15px; }
+.reveal-mark { position: absolute; left: 0; width: 1px; height: 1px; pointer-events: none; }
+.reveal-mark.top { top: 0; }
+.reveal-mark.bottom { bottom: 0; }
 .row-ser::before, .row-ser::after { content: ""; position: absolute; width: 200px; height: 70px; border: 0 solid var(--primary); pointer-events: none; }
 .row-ser::before { right: -25px; top: -40px; border-top-width: 10px; border-right-width: 10px; }
 .row-ser::after { left: -25px; bottom: -15px; border-bottom-width: 10px; border-left-width: 10px; }

@@ -141,19 +141,20 @@
   /* ------------------------------------------------------------------
      Scroll reveal ([data-animate])
      ------------------------------------------------------------------ */
-  var revealEls = $$('[data-animate]').filter(function (el) { return !el.closest('.hero-slide'); });
+  var revealEls = $$('[data-animate], [data-reveal]').filter(function (el) { return !el.closest('.hero-slide'); });
   if ('IntersectionObserver' in window) {
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (en) {
         if (en.isIntersecting) {
-          en.target.setAttribute('data-animated', 'true');
+          if (en.target.hasAttribute('data-reveal')) en.target.classList.add('is-revealed');
+          else en.target.setAttribute('data-animated', 'true');
           io.unobserve(en.target);
         }
       });
     }, { rootMargin: '0px 0px -5% 0px', threshold: 0 });
     revealEls.forEach(function (el) { io.observe(el); });
   } else {
-    revealEls.forEach(function (el) { el.setAttribute('data-animated', 'true'); });
+    revealEls.forEach(function (el) { el.setAttribute('data-animated', 'true'); el.classList.add('is-revealed'); });
   }
 
   /* ------------------------------------------------------------------
