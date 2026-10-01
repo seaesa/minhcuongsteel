@@ -1,5 +1,6 @@
 """Generates index.html from section templates + data lists."""
 from pathlib import Path
+import re
 import html
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -282,5 +283,7 @@ replacements = {
 }
 for k, v in replacements.items():
     page = page.replace(k, v)
+# pages not built yet: keep users on this site instead of sending them to the original
+page = re.sub(r'(href|action)="' + re.escape(SITE) + r'[^"]*"', r'\1="#"', page)
 (ROOT / "index.html").write_text(page, encoding="utf-8")
 print("index.html written", len(page))

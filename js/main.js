@@ -505,11 +505,18 @@
   var panelOf = function (t) { return $('#why-' + t.getAttribute('data-tab')); };
 
   function placePointer(tab, animate) {
+    tabs.forEach(function (t) { var p = panelOf(t); p.style.borderTopLeftRadius = p.style.borderBottomLeftRadius = ''; });
     if (isSmall()) return;
     var panel = panelOf(tab);
     pointer.classList.toggle('no-anim', !animate);
-    pointer.style.left = (panel.offsetLeft - 12) + 'px';
-    pointer.style.top = (tab.offsetTop + tab.offsetHeight / 2 - 12) + 'px';
+    var h = pointer.offsetHeight, mid = tab.offsetTop + tab.offsetHeight / 2;
+    // overlap the panel edge by 1px so arrow + panel read as one shape
+    pointer.style.left = (panel.offsetLeft - pointer.offsetWidth + 1) + 'px';
+    pointer.style.top = (mid - h / 2) + 'px';
+    // square off the panel corner when the arrow sits inside its rounded zone
+    var r = 20, top = mid - h / 2 - panel.offsetTop, bottom = panel.offsetTop + panel.offsetHeight - (mid + h / 2);
+    panel.style.borderTopLeftRadius = top < r ? '0' : '';
+    panel.style.borderBottomLeftRadius = bottom < r ? '0' : '';
   }
   function openAccordion(panel, open) {
     if (open) {
