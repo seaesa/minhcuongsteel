@@ -357,9 +357,14 @@ def render(p):
     # assets are referenced from the site root so nested pages work
     page = re.sub(r'(src|href)="(css|js|images|fonts)/', r'\1="/\2/', page)
     page = page.replace('url(images/', 'url(/images/').replace('href="index.html"', 'href="/"')
+    # cache-busting: a new build always serves the current CSS/JS
+    page = page.replace('href="/css/style.css"', f'href="/css/style.css?v={ASSET_V}"').replace('src="/js/main.js"', f'src="/js/main.js?v={ASSET_V}"')
     return mark_active(page, p.nav)
 
 
+import hashlib  # noqa: E402
+
+ASSET_V = hashlib.md5((ROOT / "css/style.css").read_bytes() + (ROOT / "js/main.js").read_bytes()).hexdigest()[:8]
 written = 0
 for p in pages:
     out = ROOT / "index.html" if p.path == "/" else ROOT / p.path.strip("/") / "index.html"

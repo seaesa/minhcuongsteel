@@ -734,7 +734,9 @@
   if (mapBox) {
     var bindMap = function () {
       $$('.vmap-item', mapBox).forEach(function (item) {
-        $('h3', item).addEventListener('click', function () {
+        // the whole card selects the location (phone link + contact toggle keep their own action)
+        item.addEventListener('click', function (e) {
+          if (e.target.closest('a, .vmap-toggle')) return;
           var k = item.getAttribute('data-map');
           $$('.vmap-item', mapBox).forEach(function (x) { x.classList.toggle('active', x === item); });
           $$('.vmap-map', mapBox).forEach(function (m) {
@@ -743,6 +745,11 @@
             var f = $('iframe', m);
             if (on && f && f.dataset.src) { f.src = f.dataset.src; delete f.dataset.src; }
           });
+          // stacked layout (map above the list): bring the updated map into view
+          var right = $('.vmap-right', mapBox);
+          if (window.innerWidth < 850 && right.getBoundingClientRect().top < 0) {
+            window.scrollTo({ top: right.getBoundingClientRect().top + window.pageYOffset - 70, behavior: 'smooth' });
+          }
         });
         $('.vmap-toggle', item).addEventListener('click', function () { item.classList.toggle('open'); });
       });

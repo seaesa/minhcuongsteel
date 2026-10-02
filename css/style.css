@@ -1604,7 +1604,7 @@ footer a:hover { transform: translateX(2px); color: var(--accent) !important; }
   -webkit-appearance: none; appearance: none; cursor: pointer;
 }
 .vmap-left--main { height: 490px; max-height: 490px; overflow-y: auto; }
-.vmap-item { padding: 23px 26px; border-bottom: 1px solid #a4a4a4; }
+.vmap-item { padding: 23px 26px; border-bottom: 1px solid #a4a4a4; cursor: pointer; }
 .vmap-item:last-child { border-bottom: 0; }
 .vmap-item h3 { position: relative; display: flex; align-items: center; margin: 0 0 15px; padding-right: 23px; color: #000; font-size: 18px; font-weight: 600; line-height: 24px; cursor: pointer; transition: color .2s; }
 .vmap-item h3::after { content: ""; position: absolute; top: 0; right: 0; width: 18px; height: 18px; background: url("../images/theme/current-location.png") center / contain no-repeat; }
