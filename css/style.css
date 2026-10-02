@@ -147,10 +147,10 @@ a.btn-main.button { min-width: 160px; height: 43px; line-height: 43px; min-heigh
   [data-animate] + [data-animate] + [data-animate] + [data-animate] + [data-animate] { transition-delay: .8s; }
   .hero-slide:not(.is-selected) [data-animated="true"] { transition: transform .7s, opacity .3s !important; }
   /* video section: the two arcs spin one full turn when the image scrolls into view */
-  /* frame corners: border-morphing run round the block, then settle as the two brackets */
+  /* frame corners: each bracket slides along its edge into its corner */
   .frame-orbit svg { opacity: 0; }
   .frame-orbit.is-revealed svg { opacity: 1; transition: opacity .4s ease; }
-  .frame-orbit.is-revealed .frame-path { animation: frameRun 3s cubic-bezier(.65, 0, .35, 1) both; }
+  .frame-orbit.is-revealed .frame-path { animation: frameRun 1.4s cubic-bezier(.22, .61, .36, 1) both; }
   .ab-col-img[data-animated="true"] .img-cus .rings,
   .vd-col-img[data-animated="true"] .video-cus .rings { animation: ringSpin 1.6s cubic-bezier(.45, .05, .25, 1) .2s 1 both; }
 }

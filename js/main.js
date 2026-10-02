@@ -141,7 +141,7 @@
   /* ------------------------------------------------------------------
      Frame corners (border morphing): two dashes on a rounded-rect path.
      Final dash positions = the ┐ (top-right) and └ (bottom-left) brackets;
-     on reveal they run one lap clockwise and bend through every corner.
+     on reveal each one slides in from the far end of its edge to its corner.
      ------------------------------------------------------------------ */
   var SVGNS = 'http://www.w3.org/2000/svg';
   $$('.frame-orbit').forEach(function (box) {
@@ -166,7 +166,8 @@
       var s1 = w - r - cw;                              // start of the top-right bracket
       rect.style.strokeDasharray = L + ' ' + (P / 2 - L);
       rect.style.setProperty('--off-end', -s1 + 'px');
-      rect.style.setProperty('--off-start', (P - s1) + 'px');
+      // dashes start at the beginning of the top edge (and, mirrored, the bottom edge)
+      rect.style.setProperty('--off-start', '0px');
     }
     layout();
     window.addEventListener('resize', layout);
